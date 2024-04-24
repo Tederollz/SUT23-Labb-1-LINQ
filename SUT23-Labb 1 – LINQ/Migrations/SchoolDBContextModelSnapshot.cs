@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SUT23_Labb_1___LINQ.Data;
 
@@ -11,12 +10,10 @@ using SUT23_Labb_1___LINQ.Data;
 
 namespace SUT23_Labb_1___LINQ.Migrations
 {
-    [DbContext(typeof(SchoolContext))]
-    [Migration("20240414134859_ initialMigration")]
-    partial class initialMigration
+    [DbContext(typeof(SchoolDBContext))]
+    partial class SchoolDBContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,16 +47,16 @@ namespace SUT23_Labb_1___LINQ.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TeacherId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("TeacherId");
+                    b.HasIndex("CourseId");
 
                     b.ToTable("Students");
                 });
@@ -79,14 +76,9 @@ namespace SUT23_Labb_1___LINQ.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TeacherId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
-
-                    b.HasIndex("TeacherId");
 
                     b.ToTable("Subjects");
                 });
@@ -99,24 +91,44 @@ namespace SUT23_Labb_1___LINQ.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CourseId");
+
                     b.ToTable("Teachers");
+                });
+
+            modelBuilder.Entity("SubjectTeacher", b =>
+                {
+                    b.Property<int>("SubjectsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeachersId")
+                        .HasColumnType("int");
+
+                    b.HasKey("SubjectsId", "TeachersId");
+
+                    b.HasIndex("TeachersId");
+
+                    b.ToTable("TeacherSubject", (string)null);
                 });
 
             modelBuilder.Entity("SUT23_Labb_1___LINQ.Models.Student", b =>
                 {
-                    b.HasOne("SUT23_Labb_1___LINQ.Models.Teacher", "Teacher")
+                    b.HasOne("SUT23_Labb_1___LINQ.Models.Course", "Course")
                         .WithMany()
-                        .HasForeignKey("TeacherId")
+                        .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Teacher");
+                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("SUT23_Labb_1___LINQ.Models.Subject", b =>
@@ -124,20 +136,35 @@ namespace SUT23_Labb_1___LINQ.Migrations
                     b.HasOne("SUT23_Labb_1___LINQ.Models.Course", null)
                         .WithMany("Subjects")
                         .HasForeignKey("CourseId");
+                });
+
+            modelBuilder.Entity("SUT23_Labb_1___LINQ.Models.Teacher", b =>
+                {
+                    b.HasOne("SUT23_Labb_1___LINQ.Models.Course", null)
+                        .WithMany("Teachers")
+                        .HasForeignKey("CourseId");
+                });
+
+            modelBuilder.Entity("SubjectTeacher", b =>
+                {
+                    b.HasOne("SUT23_Labb_1___LINQ.Models.Subject", null)
+                        .WithMany()
+                        .HasForeignKey("SubjectsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("SUT23_Labb_1___LINQ.Models.Teacher", null)
-                        .WithMany("Subjects")
-                        .HasForeignKey("TeacherId");
+                        .WithMany()
+                        .HasForeignKey("TeachersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SUT23_Labb_1___LINQ.Models.Course", b =>
                 {
                     b.Navigation("Subjects");
-                });
 
-            modelBuilder.Entity("SUT23_Labb_1___LINQ.Models.Teacher", b =>
-                {
-                    b.Navigation("Subjects");
+                    b.Navigation("Teachers");
                 });
 #pragma warning restore 612, 618
         }

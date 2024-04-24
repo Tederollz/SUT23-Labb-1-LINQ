@@ -10,6 +10,6 @@ namespace SUT23_Labb_1___LINQ.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public Teacher Teacher { get; set; }
+        public Course Course { get; set; }
     }
 }

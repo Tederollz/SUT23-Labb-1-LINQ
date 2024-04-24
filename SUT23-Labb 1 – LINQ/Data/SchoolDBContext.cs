@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SUT23_Labb_1___LINQ.Data
 {
-    internal class SchoolContext : DbContext
+    internal class SchoolDBContext : DbContext
     {
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Student> Students { get; set; }
@@ -20,5 +20,13 @@ namespace SUT23_Labb_1___LINQ.Data
         {
             optionsBuilder.UseSqlServer("Data source=LINUSLOQ; Initial Catalog=Labb1_LINQ; Integrated Security=true; TrustServerCertificate=True;");
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Teacher>()
+                .HasMany(t => t.Subjects)
+                .WithMany(s => s.Teachers)
+                .UsingEntity(j => j.ToTable("TeacherSubject"));
+        }
+
     }
 }

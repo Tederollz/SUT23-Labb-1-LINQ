@@ -10,5 +10,6 @@ namespace SUT23_Labb_1___LINQ.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public ICollection<Teacher> Teachers { get; set; }
     }
 }
